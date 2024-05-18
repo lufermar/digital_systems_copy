@@ -1,0 +1,5 @@
+db/
+incremental_db/
+output_files
+src/quartus_proj.sv.bak 
+src/quartus_proj_assignment_defaults.qdf
