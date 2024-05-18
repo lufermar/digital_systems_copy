@@ -1,5 +1,3 @@
-
-
 module FilterStateMachine (  
     input logic clk_i,
     input logic [2:0] state_i, // 4 states: OFF, IDLE, IIR, FFR
@@ -13,17 +11,19 @@ module FilterStateMachine (
     IIR,   // FPGA applies IIR filter
     FIR   // FPGA applies FFR filter
   } state_e;
-  signed [15:0] data_filtered; // filtered data
+
   typedef struct packed {
     state_e state;
-      } state_t;
+    logic unsigned [15:0] data_filtered;
+  } state_t;
   
   state_t state_q, state_d;
   
   // the flipflops
   always_ff @(posedge clk_i) begin
     if (!state_i[0]) begin
-      state_q.state   <= OFF;
+      state_q.state  <= OFF;
+      state_q.data_filtered <= data_i;
     end else begin
       state_q  <= state_d;
     end
@@ -33,34 +33,57 @@ module FilterStateMachine (
   // next state logic
   always_comb begin
     // defaults:
-    state_d.state   = state_q.state;
+    state_d = state_q;
     
     case(state_q.state)
       OFF: begin
         if (state_i[0]) begin
-            if (state_i[1] * state_i[2]) state_d.state = IIR;
-            if (state_i[1] * !state_i[2]) state_d.state = FIR;
-            if (!state_i[1]) state_d.state = IDLE;
+            if (state_i[1] * state_i[2]) begin
+              state_d.state = IIR;
+              state_d.data_filtered = data_i;
+            end
+            if (state_i[1] * !state_i[2]) begin
+              state_d.state = FIR;
+              state_d.data_filtered = data_i;
+            end
+            if (!state_i[1]) begin
+              state_d.state = IDLE;
+              state_d.data_filtered = data_i;
+            end
         end else begin
-            data_filtered = 0;
+            state_d.data_filtered = data_i;
         end
       end
       IDLE: begin
-        if (!state_i[0]) state_d.state = OFF;
+        if (!state_i[0]) begin
+          state_d.state = OFF;
+          state_d.data_filtered = data_i;
+        end
         if (state_i[0]) begin
-            if (state_i[1] * state_i[2]) state_d.state = IIR;
-            if (state_i[1] * !state_i[2]) state_d.state = FIR;
-        end else begin
-            data_filtered = data_i;
+            if (state_i[1] * state_i[2]) begin
+              state_d.state = IIR;
+              state_d.data_filtered = data_i;
+            end
+            if (state_i[1] * !state_i[2]) begin
+              state_d.state = FIR;
+              state_d.data_filtered = data_i;
+            end
         end
       end
       IIR: begin
-        if (!state_i[0]) state_d.state = OFF;
+        if (!state_i[0]) begin
+          state_d.state = OFF;
+          state_d.data_filtered = data_i;
+        end
         if (state_i[0]) begin
-            if (!state_i[1]) state_d.state = IDLE;
-            if (state_i[1] * !state_i[2]) state_d.state = FIR;
-        end else begin
-            data_filtered = 0;
+            if (!state_i[1]) begin
+              state_d.state = IDLE;
+              state_d.data_filtered = data_i;
+            end
+            if (state_i[1] * !state_i[2]) begin
+              state_d.state = FIR;
+              state_d.data_filtered = data_i;
+            end
         end
       end
       
@@ -70,17 +93,17 @@ module FilterStateMachine (
             if (!state_i[1]) state_d.state = IDLE;
             if (state_i[1] * state_i[2]) state_d.state = IIR;
         end else begin
-            data_filtered = 0;
+            state_d.data_filtered = data_i;
         end
       end
       
       
-      default: state_d.state = state_q.state; // it's always a good idea to add this!
+      default: state_d = state_q; // it's always a good idea to add this!
     endcase
   end // next-state logic
   
   
   // the output
-  assign data_o = data_filtered;
+  assign data_o = data_i;
 
 endmodule

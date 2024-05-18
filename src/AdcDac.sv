@@ -61,18 +61,17 @@ module AdcDac(
     );
     
     FilterStateMachine fsm(
-        .clk_i(tick),
-        .reset_i(reset),
+        .clk_i(clk),
         .state_i(SW[2:0]),
         .data_i(data),
-        .data_o(data)
+        .data_o(data_filtered)
     );
 
     DacWriter writer(
         .clk_i(clk),
         .reset_i(reset),
         .start_i(tick),
-        .data_i(data),
+        .data_i(data_filtered),
         .spi_clk_o(dac_clk),
         .spi_mosi_o(dac_mosi),
         .spi_cs_o(dac_cs),
