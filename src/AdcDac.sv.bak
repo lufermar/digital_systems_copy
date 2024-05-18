@@ -41,7 +41,7 @@ module AdcDac(
     ); */
 
     TickGen #(
-    .DIVIDER(50)
+    .DIVIDER(100)
     ) tickGen (
     .clk_i(clk),
     .reset_i(reset),

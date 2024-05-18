@@ -11,8 +11,8 @@ module TickGen
     );
 
     logic unsigned [23:0] counter_r;
-    logic unsigned [23:0] divider_r; 
-
+    logic unsigned [23:0] divider_r = 24'(DIVIDER); 
+/* 
     always_ff @(posedge reset_i, posedge toggle_i) begin
         if (reset_i) begin
             divider_r <= 24'(DIVIDER);
@@ -21,7 +21,7 @@ module TickGen
         end else begin
             divider_r <= 24'(DIVIDER);
         end
-    end
+    end */
 
     always_ff @(posedge clk_i)
     begin
