@@ -1,12 +1,10 @@
 
 
-module FilterStateMachine #(
-    parameter TIMER_W = 16 // bit depth of the timer #do we need this?
-  )(  
+module FilterStateMachine (  
     input logic clk_i,
     input logic [2:0] state_i, // 4 states: OFF, IDLE, IIR, FFR
-
-    output logic unsigned [TIMER_W-1:0] state_o  // two things: connection to correct file and print state in screen
+    input signed [15:0] data_i, // input data
+    output signed [15:0] data_o  // two things: connection to correct file and print state in screen
   );
   
   typedef enum logic [1:0] {
@@ -15,7 +13,7 @@ module FilterStateMachine #(
     IIR,   // FPGA applies IIR filter
     FIR   // FPGA applies FFR filter
   } state_e;
-
+  signed [15:0] data_filtered; // filtered data
   typedef struct packed {
     state_e state;
       } state_t;
@@ -43,6 +41,8 @@ module FilterStateMachine #(
             if (state_i[1] * state_i[2]) state_d.state = IIR;
             if (state_i[1] * !state_i[2]) state_d.state = FIR;
             if (!state_i[1]) state_d.state = IDLE;
+        end else begin
+            data_filtered = 0;
         end
       end
       IDLE: begin
@@ -50,6 +50,8 @@ module FilterStateMachine #(
         if (state_i[0]) begin
             if (state_i[1] * state_i[2]) state_d.state = IIR;
             if (state_i[1] * !state_i[2]) state_d.state = FIR;
+        end else begin
+            data_filtered = data_i;
         end
       end
       IIR: begin
@@ -57,6 +59,8 @@ module FilterStateMachine #(
         if (state_i[0]) begin
             if (!state_i[1]) state_d.state = IDLE;
             if (state_i[1] * !state_i[2]) state_d.state = FIR;
+        end else begin
+            data_filtered = 0;
         end
       end
       
@@ -65,6 +69,8 @@ module FilterStateMachine #(
         if (state_i[0]) begin
             if (!state_i[1]) state_d.state = IDLE;
             if (state_i[1] * state_i[2]) state_d.state = IIR;
+        end else begin
+            data_filtered = 0;
         end
       end
       
@@ -75,6 +81,6 @@ module FilterStateMachine #(
   
   
   // the output
-  assign state_o = //signal to be implemented
+  assign data_o = data_filtered;
 
 endmodule

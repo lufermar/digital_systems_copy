@@ -60,6 +60,14 @@ module AdcDac(
 		 .is_idle_o()
     );
     
+    FilterStateMachine fsm(
+        .clk_i(tick),
+        .reset_i(reset),
+        .state_i(SW[2:0]),
+        .data_i(data),
+        .data_o(data)
+    );
+
     DacWriter writer(
         .clk_i(clk),
         .reset_i(reset),
