@@ -91,16 +91,16 @@ module AdcDac(
         if (!SW[0]) begin
             data_filtered = 16'b0;
         end
-        if (SW[0]) begin
+        else begin
             if (!SW[1]) begin
                 data_filtered = data;
             end
-            if (SW[1]) begin
+            else begin
                 if (!SW[2]) begin 
-                    data_filtered = data_fir;
+                    data_filtered = 16'b0;//data_fir;
                 end
-                if (SW[2]) begin
-                    data_filtered = data_iir;
+                else begin
+                    data_filtered = 16'b0;//data_iir;
                 end
             end
         end
