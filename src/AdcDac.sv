@@ -16,6 +16,9 @@ module AdcDac(
     logic clk;
     logic tick;
     logic signed[15:0] data;
+    logic signed[15:0] data_filtered;
+    logic signed[15:0] data_iir;
+    logic signed[15:0] data_fir;
     
     logic              adc_clk;        // SPI clk
     logic              adc_mosi;       // MOSI: always 1
@@ -64,7 +67,7 @@ module AdcDac(
         .clk_i(clk),
         .reset_i(reset),
         .start_i(tick),
-        .data_i(data),
+        .data_i(data_filtered),
         .spi_clk_o(dac_clk),
         .spi_mosi_o(dac_mosi),
         .spi_cs_o(dac_cs),
@@ -84,7 +87,24 @@ module AdcDac(
     assign adc_miso = ARDUINO_IO[7];
 
         
-	 // Connect the LEDs 0 and 1 to the switches 0 and 1
+    always_comb begin
+        if (!SW[0]) begin
+            data_filtered = 16'b0;
+        end
+        else begin
+            if (!SW[1]) begin
+                data_filtered = data;
+            end
+            else begin
+                if (!SW[2]) begin 
+                    data_filtered = 16'b0;//data_fir;
+                end
+                else begin
+                    data_filtered = 16'b0;//data_iir;
+                end
+            end
+        end
+    end
     SevenSegment0 digit0(SW[2:0], HEX0[6:0]);
     assign HEX0[7] = 1; // turn dot off
     SevenSegment1 digit1(SW[2:0], HEX1[6:0]);
