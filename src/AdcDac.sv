@@ -44,7 +44,7 @@ module AdcDac(
     ); */
 
     TickGen #(
-    .DIVIDER(50)
+    .DIVIDER(32)
     ) tickGen (
     .clk_i(clk),
     .reset_i(reset),
@@ -74,10 +74,19 @@ module AdcDac(
         .dac_reset_no(dac_reset_n),
 		  .is_idle_o()
     );
+	 
+	 iir #(
+		.timeconstant(27)
+	 ) iir(
+		.clk_i(tick),
+		.reset_i(reset_i),
+		.data_i(data),
+		.data_o(data_iir)
+	 );
     
     // the wireing:
     assign ARDUINO_IO[0] = dac_cs;
-	assign ARDUINO_IO[1] = dac_clk;
+	 assign ARDUINO_IO[1] = dac_clk;
     assign ARDUINO_IO[2] = dac_mosi;
     assign ARDUINO_IO[3] = dac_reset_n;
     
@@ -100,7 +109,7 @@ module AdcDac(
                     data_filtered = 16'b0;//data_fir;
                 end
                 else begin
-                    data_filtered = 16'b0;//data_iir;
+                    data_filtered = data_iir;//data_iir;
                 end
             end
         end
@@ -113,6 +122,6 @@ module AdcDac(
     assign HEX2[7] = 1; // turn dot off
     SevenSegment3 digit3(SW[2:0], HEX3[6:0]);
     assign HEX2[7] = 1; // turn dot off
-	assign HEX3[7] = 1; // turn dot off
+	 assign HEX3[7] = 1; // turn dot off
     
 endmodule
