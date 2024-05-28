@@ -30,7 +30,7 @@ module butter
     end
 
     always_comb begin
-        sum = data_i * b[0] + delayed_input_d1 * b[1] + delayed_input_d2 * b[2] - delayed_output_d1 * a[1] - delayed_output_d2 * a[2];
+        sum = data_i * 1 / 100000 + delayed_input_d1 * 1/50000 + delayed_input_d2 * 1/100000 - delayed_output_d1 * -19999/10000 - delayed_output_d2 * 9999/10000;
     end
 
     assign data_o = output_q;
