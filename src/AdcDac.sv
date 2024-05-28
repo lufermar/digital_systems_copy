@@ -83,6 +83,16 @@ module AdcDac(
 		.data_i(data),
 		.data_o(data_iir)
 	 );
+
+     
+     butter #(
+		.timeconstant(27)
+     ) butter(
+		.clk_i(tick),
+		.reset_i(reset_i),
+		.data_i(data),
+		.data_o(data_butter)
+	 );
     
     // the wireing:
     assign ARDUINO_IO[0] = dac_cs;
@@ -106,7 +116,7 @@ module AdcDac(
             end
             else begin
                 if (!SW[2]) begin 
-                    data_filtered = 16'b0;//data_fir;
+                    data_filtered = data_butter;//data_fir;
                 end
                 else begin
                     data_filtered = data_iir;//data_iir;
