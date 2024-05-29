@@ -30,18 +30,28 @@ module AdcDac(
     logic              dac_cs;         // chip select
     logic              dac_reset_n;    // reset of the DAC
 	 
+	 logic debounced_key_1;
+	 logic debounced_key_2;
+	 
 	 
     
     assign reset = !KEY[0];
     assign clk = MAX10_CLK1_50;
 	 
 	 
-/*     Debouncer #(50) debounce(
+	 Debouncer #(50) debounce_1(
+        .clk_i(clk),
+        .reset_i(reset),
+        .bouncing_i(KEY[0]),
+        .debounced_o(debounced_key_1)
+    );
+	 
+	 Debouncer #(50) debounce_2(
         .clk_i(clk),
         .reset_i(reset),
         .bouncing_i(KEY[1]),
-        .debounced_o(debounced_key)
-    ); */
+        .debounced_o(debounced_key_2)
+    );
 
     TickGen #(
     .DIVIDER(32)
@@ -76,7 +86,8 @@ module AdcDac(
     );
 	 
 	 iir #(
-		.timeconstant(27)
+		.coef_delayed_input(-62308),
+		.coef_delayed_output(58982)
 	 ) iir(
 		.clk_i(tick),
 		.reset_i(reset_i),
