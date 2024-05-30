@@ -82,12 +82,13 @@ module AdcDac(
         .spi_mosi_o(dac_mosi),
         .spi_cs_o(dac_cs),
         .dac_reset_no(dac_reset_n),
-		  .is_idle_o()
+		.is_idle_o()
     );
 	 
-	 iir #(
-		.coef_delayed_input(-62308),
-		.coef_delayed_output(58982)
+	 iir_mod #(
+		.coef_b0(131701),
+		.coef_b1(0),
+		.coef_a1(0)
 	 ) iir(
 		.clk_i(tick),
 		.reset_i(reset_i),
