@@ -85,20 +85,11 @@ module AdcDac(
 		.is_idle_o()
     );
 	 
-	//  iir_mod #(
-	// 	.coef_b0(65535),
-	// 	.coef_b1(-61309),
-	// 	.coef_a1(50000)
-	//  ) iir(
-	// 	.clk_i(tick),
-	// 	.reset_i(reset_i),
-	// 	.data_i(data),
-	// 	.data_o(data_iir)
-	//  );
+
 
      fir_simple #(
-      .coef_b0(32767),
-		.coef_b1(-32767),
+      .coef_b0(131070),
+		.coef_b1(-123584),
 		.coef_a1(0)
      ) fir_simple (
 		.clk_i(tick),
@@ -106,10 +97,17 @@ module AdcDac(
 		.data_i(data),
 		.data_o(data_fir)
 	 );
+	 
+	 iir_mod iir_mod (
+		.clk_i(tick),
+		.reset_i(reset_i),
+		.data_i(data),
+		.data_o(data_iir)
+	 );
     
     // the wireing:
     assign ARDUINO_IO[0] = dac_cs;
-	assign ARDUINO_IO[1] = dac_clk;
+	 assign ARDUINO_IO[1] = dac_clk;
     assign ARDUINO_IO[2] = dac_mosi;
     assign ARDUINO_IO[3] = dac_reset_n;
     
@@ -132,7 +130,7 @@ module AdcDac(
                     data_filtered = data_fir;//data_fir;
                 end
                 else begin
-                    data_filtered = 16'b0;//data_iir;
+                    data_filtered = data_iir;//data_iir;
                 end
             end
         end
