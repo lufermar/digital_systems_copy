@@ -54,7 +54,7 @@ module AdcDac(
     );
 
     TickGen #(
-    .DIVIDER(32)
+    .DIVIDER(50)
     ) tickGen (
     .clk_i(clk),
     .reset_i(reset),
@@ -86,14 +86,25 @@ module AdcDac(
     );
 	 
 	 iir_mod #(
-		.coef_b0(131701),
-		.coef_b1(0),
-		.coef_a1(0)
+		.coef_b0(65535),
+		.coef_b1(-61309),
+		.coef_a1(50000)
 	 ) iir(
 		.clk_i(tick),
 		.reset_i(reset_i),
 		.data_i(data),
 		.data_o(data_iir)
+	 );
+
+     fir_simple #(
+      .coef_b0(32767),
+		.coef_b1(-32768),
+		.coef_a1(0)
+     ) fir_simple (
+		.clk_i(tick),
+		.reset_i(reset_i),
+		.data_i(data),
+		.data_o(data_fir)
 	 );
     
     // the wireing:
@@ -118,7 +129,7 @@ module AdcDac(
             end
             else begin
                 if (!SW[2]) begin 
-                    data_filtered = 16'b0;//data_fir;
+                    data_filtered = data_fir;//data_fir;
                 end
                 else begin
                     data_filtered = data_iir;//data_iir;

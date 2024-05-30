@@ -1,8 +1,8 @@
-module iir_mod
+module fir_simple
     #(
-        parameter logic signed [18:0] coef_b0 = 18'sd65535,
-        parameter logic signed [18:0] coef_b1 = -18'sd61309,
-        parameter logic signed [18:0] coef_a1 = 18'sd0,
+        parameter logic signed [15:0] coef_b0 = 16'sd32767,
+        parameter logic signed [15:0] coef_b1 = -16'sd32768,
+        parameter logic signed [15:0] coef_a1 = 16'sd0,
         parameter inout_width = 16,
         parameter inout_decimal_width = 15,
         parameter internal_width = 16,
